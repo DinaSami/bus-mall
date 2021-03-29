@@ -5,7 +5,13 @@ const leftImage = document.getElementById('left');
 const centerImage = document.getElementById('center');
 const rightImage = document.getElementById('right');
 const imageSection = document.getElementById('images');
-
+const bottonResult = document.getElementById('btn');
+let imageOnLeft;
+let imageOnCanter;
+let imageOnRight;
+let attempts = 0;
+let votesArray = [];
+let viewsArray = [];
 
 function Product(name) {
   this.name = name;
@@ -16,56 +22,120 @@ function Product(name) {
 }
 Product.all = [];
 
+
 for (let i = 0; i < images.length; i++) {
   new Product(images[i]);
 }
+
+
 function render() {
-  const imageOnLeft = randomNumber(0, Product.all.length - 1);
+
+  imageOnLeft = randomNumber(0, Product.all.length - 1);
+  imageOnCanter = randomNumber(0, Product.all.length - 1);
+  imageOnRight = randomNumber(0, Product.all.length - 1);
+
+
+  while (imageOnLeft === imageOnCanter || imageOnLeft === imageOnRight) {
+    imageOnLeft = randomNumber(0, Product.all.length - 1);
+  }
+
   leftImage.src = Product.all[imageOnLeft].image;
   leftImage.alt = Product.all[imageOnLeft].name;
   leftImage.title = Product.all[imageOnLeft].name;
+  Product.all[imageOnLeft].views++;
 
+  while (imageOnCanter === imageOnRight || imageOnCanter === imageOnLeft) {
+    imageOnCanter = randomNumber(0, Product.all.length - 1);
+  }
 
-
-  const imageOnCanter = randomNumber(0, Product.all.length - 1);
   centerImage.src = Product.all[imageOnCanter].image;
   centerImage.alt = Product.all[imageOnCanter].name;
   centerImage.title = Product.all[imageOnCanter].name;
+  Product.all[imageOnCanter].views++;
 
-
-
-
-  const imageOnRight = randomNumber(0, Product.all.length - 1);
+  while (imageOnRight === imageOnCanter || imageOnRight === imageOnLeft) {
+    imageOnRight = randomNumber(0, Product.all.length - 1);
+  }
   rightImage.src = Product.all[imageOnRight].image;
   rightImage.alt = Product.all[imageOnRight].name;
   rightImage.title = Product.all[imageOnRight].name;
-
-  const listPro = document.createElement('ul');
-  imageSection.appendChild(listPro);
-
-
-  for (let i = 0; i < images.length; i++) {
-    const liEl = document.createElement('li');
-    listPro.appendChild(liEl);
-    liEl.textContent = `${Product.all[i].name} had ${Product.all[i].votes} votes, and was seen ${Product.all[i].views} times.`;
-  }
+  Product.all[imageOnRight].views++;
 }
 
-imageSection.addEventListener('click', clickImage);
+imageSection.addEventListener('click', clickImages);
 
-function clickImage(event) {
+function clickImages(event) {
+
+
   if (event.target.id !== 'images') {
-    for (let i = 0; i < Product.all.length; i++) {
-      if (Product.all[i].name === event.target.title) {
-        Product.all[i].votes++;
-        Product.all[i].views++;
+
+    if (attempts < 10) {
+      attempts++;
+      render();
+      if (event.target.id === leftImage.id) {
+        Product.all[imageOnLeft].votes++;
+
+      } else if (event.target.id === centerImage.id) {
+        Product.all[imageOnCanter].votes++;
+      }
+      else {
+        Product.all[imageOnRight].votes++;
       }
     }
   }
-  render();
+}
+
+
+bottonResult.addEventListener('click', resultBotton);
+
+function resultBotton() {
+
+  let listImages = document.getElementById('listProducts');
+  for (let i = 0; i < Product.all.length; i++) {
+    votesArray.push(Product.all[i].votes);
+    viewsArray.push(Product.all[i].views);
+    let liEl = document.createElement('li');
+    listImages.appendChild(liEl);
+    liEl.textContent = `${Product.all[i].name} had ${Product.all[i].votes} votes, and was seen ${Product.all[i].views} times.`
+  }
+  bottonResult.removeEventListener('click', resultBotton);
+  chartRender();
 }
 
 function randomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 render();
+Product.all[imageOnLeft].views--;
+Product.all[imageOnCanter].views--;
+Product.all[imageOnRight].views--;
+
+
+function chartRender() {
+  let ctx = document.getElementById('myChart').getContext('2d');
+  let chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'bar',
+
+    // The data for our dataset
+    data: {
+      labels: images,
+      datasets: [{
+        label: 'Products votes',
+        backgroundColor: 'red',
+        borderColor: 'red',
+        data: votesArray
+      },
+      {
+        label: 'Products views',
+        backgroundColor: 'black',
+        borderColor: 'black',
+        data: viewsArray
+      }]
+    },
+
+    // Configuration options go here
+    options: {}
+  });
+
+}

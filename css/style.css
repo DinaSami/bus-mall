@@ -19,8 +19,11 @@ img{
     border-radius: 5px;
     box-shadow: 5px 5px 5px 5px rgb(128, 126, 126);
 }
-/* p{
-    text-align: left;
+#btn{
     padding: 10px;
-    display: inline-block;
-} */
+    font-size: 15px;
+    margin-left:180px;
+    font-weight: bold;
+    width: 100px;
+    box-shadow: 5px 5px 5px 5px rgb(128, 126, 126);
+}
