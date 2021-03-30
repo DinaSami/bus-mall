@@ -13,14 +13,33 @@ let attempts = 0;
 let votesArray = [];
 let viewsArray = [];
 
+
+
+
 function Product(name) {
   this.name = name;
   this.image = `./assets/${this.name}.jpg`;
   this.votes = 0;
   this.views = 0;
   Product.all.push(this);
+  // settToLocal();
 }
 Product.all = [];
+gettFromLocal();
+
+function settToLocal() {
+  let convertToString = JSON.stringify(Product.all);
+  localStorage.setItem('product', convertToString);
+}
+
+
+function gettFromLocal() {
+  let stringObj = localStorage.getItem('product');
+  let normalObj = JSON.parse(stringObj);
+  // if(Product.all !== null){
+  //   Product.all=normalObj;
+  // }
+}
 
 
 for (let i = 0; i < images.length; i++) {
@@ -98,8 +117,10 @@ function resultBotton() {
     listImages.appendChild(liEl);
     liEl.textContent = `${Product.all[i].name} had ${Product.all[i].votes} votes, and was seen ${Product.all[i].views} times.`
   }
+  settToLocal();
   bottonResult.removeEventListener('click', resultBotton);
   chartRender();
+  gettFromLocal();
 }
 
 function randomNumber(min, max) {
@@ -138,4 +159,7 @@ function chartRender() {
     options: {}
   });
 
+}
+function helloCodeFellows() {
+  // do some logic and return a valid value 
 }
